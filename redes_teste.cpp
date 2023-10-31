@@ -3,14 +3,17 @@
 #include <fstream>
 #include <iostream>
 #include <netinet/in.h>
+#include <sstream>
 #include <stdlib.h>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-#define PORT 8080 // Isso vai ter que ser definido depois pelo txt
+// #define PORT 8080 // Isso vai ter que ser definido depois pelo txt
 #define MAXLINE 1024
+
+int port = 8080;
 
 using namespace std;
 
@@ -29,11 +32,28 @@ MachineClient machine_creation() { // Mudar depois caso necessario
   MachineClient Machine;
   string token;
   int counter = 1;
+  
+  string segment;
+  int iC = 0;
   ifstream My_machine_file("machine_configuration.txt");
   while (getline(My_machine_file, token, '\n')) {
+    stringstream token_separator(token);
     switch (counter) {
     case 1:
-      Machine.right_ip = token;
+
+      // Machine.right_ip = token;
+
+      while (getline(token_separator, segment, ':')) { //Separo Porta e IP
+          
+        if (iC == 0) {
+       
+          Machine.right_ip = segment;
+        } else if (iC == 1) {
+          port = stoi(segment);
+        }
+        iC++;
+      }
+
       break;
     case 2:
 
@@ -60,20 +80,20 @@ MachineClient machine_creation() { // Mudar depois caso necessario
 
   inet_pton(AF_INET, Machine.right_ip.c_str(),
             &(sa.sin_addr)); // Converte de string para ip
-  //cout << &sa.sin_addr <<endl; //Ver o que sai nessa saida
+  // cout << &sa.sin_addr <<endl; //Ver o que sai nessa saida
   My_machine_file.close();
 
-  
   return Machine;
 }
 
 void client() {
   int sockfd;
   char buffer[MAXLINE];
-  const char *hello = "Hello from client"; //Isso ira receber a mensagem da file depois
+  const char *hello =
+      "Hello from client"; // Isso ira receber a mensagem da file depois
 
   // Creating socket file descriptor
-  if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { //SOCK_DGRAM = UDP
+  if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { // SOCK_DGRAM = UDP
     perror("socket creation failed");
     exit(EXIT_FAILURE);
   }
@@ -81,8 +101,8 @@ void client() {
   memset(&sa, 0, sizeof(sa));
 
   // Filling server information
-  sa.sin_family = AF_INET;
-  sa.sin_port = htons(PORT); // Aqui salvo a porta do arquivo de configuração
+  sa.sin_family = AF_INET;  
+  sa.sin_port = htons(port); // Aqui salvo a porta do arquivo de configuração
   sa.sin_addr.s_addr = INADDR_ANY; // Aqui salvo o IP do PC a direita
 
   int n;
