@@ -10,10 +10,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-// #define PORT 8080 // Isso vai ter que ser definido depois pelo txt
+#define PORT 8080 // Isso vai ter que ser definido depois pelo txt
 #define MAXLINE 1024
 
-int port = 8080;
+int porta = 8080;
 
 using namespace std;
 
@@ -49,7 +49,7 @@ MachineClient machine_creation() { // Mudar depois caso necessario
        
           Machine.right_ip = segment;
         } else if (iC == 1) {
-          port = stoi(segment);
+          porta = stoi(segment);
         }
         iC++;
       }
@@ -101,18 +101,18 @@ void client() {
   memset(&sa, 0, sizeof(sa));
 
   // Filling server information
-  sa.sin_family = AF_INET;  
-  sa.sin_port = htons(port); // Aqui salvo a porta do arquivo de configuração
-  sa.sin_addr.s_addr = INADDR_ANY; // Aqui salvo o IP do PC a direita
+  sa.sin_family = AF_INET;  //Designa quais endereços meu socket pode se comunicar 
+  sa.sin_port = htons(PORT); // Aqui salvo a porta do meu PC 
+  sa.sin_addr.s_addr = INADDR_ANY; // Ligo em todos os sockets para receber valores de qualquer porta
 
   int n;
   socklen_t len;
 
-  sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM,
+  sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM, //Envia dados para o Socket
          (const struct sockaddr *)&sa, sizeof(sa));
   std::cout << "Hello message sent." << std::endl;
 
-  n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL,
+  n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL,  //Recebe data do Socket
                (struct sockaddr *)&sa, &len);
   buffer[n] = '\0';
   std::cout << "Server :" << buffer << std::endl;
