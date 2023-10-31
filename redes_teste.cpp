@@ -33,7 +33,6 @@ MachineClient machine_creation() { // Mudar depois caso necessario
   while (getline(My_machine_file, token, '\n')) {
     switch (counter) {
     case 1:
-
       Machine.right_ip = token;
       break;
     case 2:
@@ -61,18 +60,20 @@ MachineClient machine_creation() { // Mudar depois caso necessario
 
   inet_pton(AF_INET, Machine.right_ip.c_str(),
             &(sa.sin_addr)); // Converte de string para ip
-
+  //cout << &sa.sin_addr <<endl; //Ver o que sai nessa saida
   My_machine_file.close();
+
+  
   return Machine;
 }
 
 void client() {
   int sockfd;
   char buffer[MAXLINE];
-  const char *hello = "Hello from client";
+  const char *hello = "Hello from client"; //Isso ira receber a mensagem da file depois
 
   // Creating socket file descriptor
-  if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+  if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { //SOCK_DGRAM = UDP
     perror("socket creation failed");
     exit(EXIT_FAILURE);
   }
