@@ -23,7 +23,7 @@ struct sockaddr_in sa; // Address
 // Implementar UDP
 struct MachineClient {
   string name;
-  int token_count, right_ip_data;
+  int token_count;
   string right_ip;
   bool Generated_token;
 };
@@ -86,7 +86,7 @@ MachineClient machine_creation() { // Mudar depois caso necessario
   return Machine;
 }
 
-void client() {
+void client(MachineClient MachineName) {
   int sockfd;
   char buffer[MAXLINE];
   const char *hello =
@@ -102,7 +102,7 @@ void client() {
 
   // Filling server information
   sa.sin_family = AF_INET;  //Designa quais endereços meu socket pode se comunicar 
-  sa.sin_port = htons(PORT); // Aqui salvo a porta do meu PC 
+  sa.sin_port = htons(porta); // Aqui salvo a porta do PC vizinho
   sa.sin_addr.s_addr = INADDR_ANY; // Ligo em todos os sockets para receber valores de qualquer porta
 
   int n;
@@ -120,6 +120,54 @@ void client() {
   close(sockfd);
 }
 
+
+
+int server(){
+  int sockfd; 
+    char buffer[MAXLINE]; 
+    const char *hello = "Hello from server"; 
+    struct sockaddr_in servaddr, cliaddr; 
+       
+    // Creating socket file descriptor 
+    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("socket creation failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+       
+    memset(&servaddr, 0, sizeof(servaddr)); 
+    memset(&cliaddr, 0, sizeof(cliaddr)); 
+       
+    // Filling server information 
+    servaddr.sin_family    = AF_INET; // IPv4 
+    servaddr.sin_addr.s_addr = INADDR_ANY; 
+    servaddr.sin_port = htons(PORT); //Recebo dados da file da porta do PC ao lado
+       
+    // Bind the socket with the server address 
+    if ( bind(sockfd, (const struct sockaddr *)&servaddr,  
+            sizeof(servaddr)) < 0 ) 
+    { 
+        perror("bind failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+       
+    socklen_t len;
+  int n; 
+   
+    len = sizeof(cliaddr);  //len is value/result 
+   
+    n = recvfrom(sockfd, (char *)buffer, MAXLINE,  
+                MSG_WAITALL, ( struct sockaddr *) &cliaddr, 
+                &len); 
+    buffer[n] = '\0'; 
+    printf("Client : %s\n", buffer); 
+    sendto(sockfd, (const char *)hello, strlen(hello),  
+        MSG_CONFIRM, (const struct sockaddr *) &cliaddr, 
+            len); 
+    std::cout<<"Hello message sent."<<std::endl;  
+       
+    return 0; 
+}
+
 int main(void) {
   MachineClient my_pc;
   my_pc = machine_creation();
@@ -128,9 +176,9 @@ int main(void) {
   cout << my_pc.token_count << endl;
   cout << my_pc.Generated_token << endl;
   //-----------------------------------Servidor
-
+  server(); //Espero a entradade dados
   //----------------------------------- Cliente
-  client();
+  client(my_pc); //Envio dados para a maquina vizinha
   //---------------------------------
   return 0;
 }
