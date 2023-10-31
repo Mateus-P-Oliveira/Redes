@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <bits/stdc++.h>
+#include <fstream>
 #include <iostream>
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -26,12 +27,42 @@ struct MachineClient {
 
 MachineClient machine_creation() { // Mudar depois caso necessario
   MachineClient Machine;
-  cin >> Machine.right_ip;
-  cin >> Machine.name;
-  cin >> Machine.token_count;
-  cin >> Machine.Generated_token;
+  string token;
+  int counter = 1;
+  ifstream My_machine_file("machine_configuration.txt");
+  while (getline(My_machine_file, token, '\n')) {
+    switch (counter) {
+    case 1:
+
+      Machine.right_ip = token;
+      break;
+    case 2:
+
+      Machine.name = token;
+      break;
+    case 3:
+
+      Machine.token_count = stoi(token);
+      break;
+    case 4:
+
+      if (token == "true") {
+        Machine.Generated_token = true;
+      } else {
+        Machine.Generated_token = false;
+      }
+
+      break;
+    default:
+      break;
+    }
+    counter++;
+  }
+
   inet_pton(AF_INET, Machine.right_ip.c_str(),
             &(sa.sin_addr)); // Converte de string para ip
+
+  My_machine_file.close();
   return Machine;
 }
 
