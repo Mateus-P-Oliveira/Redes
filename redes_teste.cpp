@@ -10,10 +10,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define PORT 8080 // Isso vai ter que ser definido depois pelo txt
+#define PORT 8000 // Isso vai ter que ser definido depois pelo txt
 #define MAXLINE 1024
 
-int porta = 8080;
+int porta = 0;
 
 using namespace std;
 
@@ -103,7 +103,7 @@ void client(MachineClient MachineName) {
   // Filling server information
   sa.sin_family = AF_INET;  //Designa quais endereços meu socket pode se comunicar 
   sa.sin_port = htons(porta); // Aqui salvo a porta do PC vizinho
-  sa.sin_addr.s_addr = INADDR_ANY; // Ligo em todos os sockets para receber valores de qualquer porta
+  sa.sin_addr.s_addr = inet_pton(AF_INET, MachineName.right_ip.c_str(), &(sa.sin_addr)); // Ligo em todos os sockets para receber valores de qualquer porta
 
   int n;
   socklen_t len;
@@ -122,7 +122,7 @@ void client(MachineClient MachineName) {
 
 
 
-int server(){
+int server(MachineClient MachineName){
   int sockfd; 
     char buffer[MAXLINE]; 
     const char *hello = "Hello from server"; 
@@ -139,7 +139,7 @@ int server(){
        
     // Filling server information 
     servaddr.sin_family    = AF_INET; // IPv4 
-    servaddr.sin_addr.s_addr = INADDR_ANY; 
+    servaddr.sin_addr.s_addr = inet_pton(AF_INET, MachineName.right_ip.c_str(), &(sa.sin_addr)); 
     servaddr.sin_port = htons(PORT); //Recebo dados da file da porta do PC ao lado
        
     // Bind the socket with the server address 
@@ -176,7 +176,7 @@ int main(void) {
   cout << my_pc.token_count << endl;
   cout << my_pc.Generated_token << endl;
   //-----------------------------------Servidor
-  server(); //Espero a entradade dados
+  server(my_pc); //Espero a entradade dados
   //----------------------------------- Cliente
   client(my_pc); //Envio dados para a maquina vizinha
   //---------------------------------
