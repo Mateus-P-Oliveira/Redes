@@ -79,7 +79,7 @@ MachineClient machine_creation() { // Mudar depois caso necessario
   }
 
   inet_pton(AF_INET, Machine.right_ip.c_str(),
-            &(sa.sin_addr)); // Converte de string para ip
+            &(sa.sin_addr)); // Converte de string para ip //A principio nao uso ela aqui
   // cout << &sa.sin_addr <<endl; //Ver o que sai nessa saida
   My_machine_file.close();
 
@@ -122,7 +122,7 @@ void client(MachineClient MachineName) {
 
 
 
-int server(MachineClient MachineName){
+int server(){
   int sockfd; 
     char buffer[MAXLINE]; 
     const char *hello = "Hello from server"; 
@@ -139,7 +139,7 @@ int server(MachineClient MachineName){
        
     // Filling server information 
     servaddr.sin_family    = AF_INET; // IPv4 
-    servaddr.sin_addr.s_addr = inet_pton(AF_INET, MachineName.right_ip.c_str(), &(sa.sin_addr)); 
+    servaddr.sin_addr.s_addr = INADDR_ANY; 
     servaddr.sin_port = htons(PORT); //Recebo dados da file da porta do PC ao lado
        
     // Bind the socket with the server address 
@@ -176,7 +176,7 @@ int main(void) {
   cout << my_pc.token_count << endl;
   cout << my_pc.Generated_token << endl;
   //-----------------------------------Servidor
-  server(my_pc); //Espero a entradade dados
+  server(); //Espero a entradade dados
   //----------------------------------- Cliente
   client(my_pc); //Envio dados para a maquina vizinha
   //---------------------------------
