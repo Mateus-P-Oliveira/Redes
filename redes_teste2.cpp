@@ -103,7 +103,7 @@ void client(MachineClient MachineName) {
   // Filling server information
   sa.sin_family = AF_INET;  //Designa quais endereços meu socket pode se comunicar 
   sa.sin_port = htons(porta); // Aqui salvo a porta do PC vizinho
-  sa.sin_addr.s_addr = INADDR_ANY; // Ligo em todos os sockets para receber valores de qualquer porta
+  sa.sin_addr.s_addr = inet_pton(AF_INET, MachineName.right_ip.c_str(), &(sa.sin_addr)); // Ligo em todos os sockets para receber valores de qualquer porta
 
   int n;
   socklen_t len;
