@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define PORT 8080 // Isso vai ter que ser definido depois pelo txt
+#define PORT 8000 // Isso vai ter que ser definido depois pelo txt
 #define MAXLINE 1024
 
 int porta = 8080;

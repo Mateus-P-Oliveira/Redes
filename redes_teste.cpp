@@ -50,6 +50,7 @@ MachineClient machine_creation() { // Mudar depois caso necessario
           Machine.right_ip = segment;
         } else if (iC == 1) {
           porta = stoi(segment);
+          cout << porta << endl;
         }
         iC++;
       }
@@ -89,6 +90,7 @@ MachineClient machine_creation() { // Mudar depois caso necessario
 void client(MachineClient MachineName) {
   int sockfd;
   char buffer[MAXLINE];
+  struct sockaddr_in cliaddr; 
   const char *hello =
       "Hello from client"; // Isso ira receber a mensagem da file depois
 
@@ -98,12 +100,25 @@ void client(MachineClient MachineName) {
     exit(EXIT_FAILURE);
   }
 
-  memset(&sa, 0, sizeof(sa));
+  //memset(&sa, 0, sizeof(sa));
 
+  
+
+   memset(&cliaddr, 0, sizeof(cliaddr)); 
   // Filling server information
-  sa.sin_family = AF_INET;  //Designa quais endereços meu socket pode se comunicar 
-  sa.sin_port = htons(porta); // Aqui salvo a porta do PC vizinho
-  sa.sin_addr.s_addr = inet_pton(AF_INET, MachineName.right_ip.c_str(), &(sa.sin_addr)); // Ligo em todos os sockets para receber valores de qualquer porta
+  cliaddr.sin_family = AF_INET;  //Designa quais endereços meu socket pode se comunicar 
+  cliaddr.sin_port = htons(porta); // Aqui salvo a porta do PC vizinho
+  cliaddr.sin_addr.s_addr = INADDR_ANY; //inet_pton(AF_INET, MachineName.right_ip.c_str(), &(cliaddr.sin_addr)); // Ligo em todos os sockets para receber valores de qualquer porta
+
+// Bind the socket with the server address 
+    if ( bind(sockfd, (const struct sockaddr *)&cliaddr,  
+            sizeof(cliaddr)) < 0 ) 
+    { 
+        perror("bind failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+
+
 
   int n;
   socklen_t len;
@@ -175,10 +190,11 @@ int main(void) {
   cout << my_pc.name << endl;
   cout << my_pc.token_count << endl;
   cout << my_pc.Generated_token << endl;
-  //-----------------------------------Servidor
-  server(); //Espero a entradade dados
   //----------------------------------- Cliente
   client(my_pc); //Envio dados para a maquina vizinha
   //---------------------------------
+  //-----------------------------------Servidor
+  server(); //Espero a entradade dados
+  
   return 0;
 }
