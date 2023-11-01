@@ -108,7 +108,7 @@ void client(MachineClient MachineName) {
   // Filling server information
   cliaddr.sin_family = AF_INET;  //Designa quais endereços meu socket pode se comunicar 
   cliaddr.sin_port = htons(porta); // Aqui salvo a porta do PC vizinho
-  cliaddr.sin_addr.s_addr = INADDR_ANY; //inet_pton(AF_INET, MachineName.right_ip.c_str(), &(cliaddr.sin_addr)); // Ligo em todos os sockets para receber valores de qualquer porta
+  cliaddr.sin_addr.s_addr = inet_pton(AF_INET, MachineName.right_ip.c_str(), &(cliaddr.sin_addr)); // Ligo em todos os sockets para receber valores de qualquer porta
 
 // Bind the socket with the server address 
     if ( bind(sockfd, (const struct sockaddr *)&cliaddr,  
