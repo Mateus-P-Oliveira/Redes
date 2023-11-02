@@ -114,12 +114,12 @@ void client(MachineClient MachineName) {
  //Aqui é onde esta tendo erro no bind
 
 // Bind the socket with the server address 
-    /*if ( bind(sockfd, (const struct sockaddr *)&cliaddr,  
+    if ( bind(sockfd, (const struct sockaddr *)&cliaddr,  
             sizeof(cliaddr)) < 0 ) 
     { 
         perror("bind failed"); 
         exit(EXIT_FAILURE); 
-    } */
+    } 
 
 
 
