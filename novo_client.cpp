@@ -79,7 +79,7 @@ MachineClient machine_creation() { // Mudar depois caso necessario
 }
 // Server
 
-void server() {
+void server(MachineClient My_machine) {
   int sockfd;
   char buffer[MAXLINE];
   const char *hello = "Hello from server";
@@ -96,7 +96,7 @@ void server() {
 
   // Filling server information
   servaddr.sin_family = AF_INET; // IPv4
-  servaddr.sin_addr.s_addr = INADDR_ANY;
+  servaddr.sin_addr.s_addr = inet_addr("127.0.0.2"); //Defino na mão o address que qeuro o servidor //INADDR_ANY   --Caso queira me ligar a todas entradas
   servaddr.sin_port = htons(PORT);
 
   // Bind the socket with the server address
@@ -113,6 +113,7 @@ void server() {
   n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL,
                (struct sockaddr *)&cliaddr, &len);
   buffer[n] = '\0';
+  sleep(My_machine.token_count);
   printf("Client : %s\n", buffer);
   sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM,
          (const struct sockaddr *)&cliaddr, len);
@@ -164,12 +165,17 @@ int main(void) {
   cout << my_pc.name << endl;
   cout << my_pc.token_count << endl;
   cout << my_pc.Generated_token << endl;
-
-     //-----------------------------------Servidor
-    server(); // Espero a entradade dados
-    //----------------------------------- Cliente
-    client(my_pc); // Envio dados para a maquina vizinha
+   while(1){
+     client(my_pc); // Envio dados para a maquina vizinha
     //---------------------------------
+        
+  //-----------------------------------Servidor
+    server(my_pc); // Espero a entradade dados
+    //----------------------------------- Cliente
+    
+   
+   }
+   
    
  
   return 0;
