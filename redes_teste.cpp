@@ -105,18 +105,21 @@ void client(MachineClient MachineName) {
   
 
    memset(&cliaddr, 0, sizeof(cliaddr)); 
+
+   
   // Filling server information
   cliaddr.sin_family = AF_INET;  //Designa quais endereços meu socket pode se comunicar 
   cliaddr.sin_port = htons(porta); // Aqui salvo a porta do PC vizinho
-  cliaddr.sin_addr.s_addr = inet_pton(AF_INET, MachineName.right_ip.c_str(), &(cliaddr.sin_addr)); // Ligo em todos os sockets para receber valores de qualquer porta
+  cliaddr.sin_addr.s_addr = INADDR_ANY;//inet_pton(AF_INET, MachineName.right_ip.c_str(), &(cliaddr.sin_addr)); // Ligo em todos os sockets para receber valores de qualquer porta
+ //Aqui é onde esta tendo erro no bind
 
 // Bind the socket with the server address 
-    if ( bind(sockfd, (const struct sockaddr *)&cliaddr,  
+    /*if ( bind(sockfd, (const struct sockaddr *)&cliaddr,  
             sizeof(cliaddr)) < 0 ) 
     { 
         perror("bind failed"); 
         exit(EXIT_FAILURE); 
-    } 
+    } */
 
 
 
@@ -124,11 +127,11 @@ void client(MachineClient MachineName) {
   socklen_t len;
 
   sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM, //Envia dados para o Socket
-         (const struct sockaddr *)&sa, sizeof(sa));
+         (const struct sockaddr *)&cliaddr, sizeof(cliaddr));
   std::cout << "Hello message sent." << std::endl;
-
+//sleep(10);
   n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL,  //Recebe data do Socket
-               (struct sockaddr *)&sa, &len);
+               (struct sockaddr *)&cliaddr, &len);
   buffer[n] = '\0';
   std::cout << "Server :" << buffer << std::endl;
 
@@ -194,7 +197,7 @@ int main(void) {
   client(my_pc); //Envio dados para a maquina vizinha
   //---------------------------------
   //-----------------------------------Servidor
-  server(); //Espero a entradade dados
+  //server(); //Espero a entradade dados
   
   return 0;
 }

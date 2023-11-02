@@ -159,6 +159,7 @@ int server(){
                 MSG_WAITALL, ( struct sockaddr *) &cliaddr, 
                 &len); 
     buffer[n] = '\0'; 
+    
     printf("Client : %s\n", buffer); 
     sendto(sockfd, (const char *)hello, strlen(hello),  
         MSG_CONFIRM, (const struct sockaddr *) &cliaddr, 
@@ -178,7 +179,7 @@ int main(void) {
   //-----------------------------------Servidor
   server(); //Espero a entradade dados
   //----------------------------------- Cliente
-  client(my_pc); //Envio dados para a maquina vizinha
+  //client(my_pc); //Envio dados para a maquina vizinha
   //---------------------------------
   return 0;
 }
