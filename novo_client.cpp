@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <netinet/in.h>
+#include <queue>
 #include <sstream>
 #include <stdlib.h>
 #include <string>
@@ -10,10 +11,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define MAXLINE 1024
+#define MAXLINE 2048
 #define PORT 8080
 
 using namespace std;
+
+queue<string> Messages; // Cria Lista de mensagens
 
 struct MachineClient {
   string name;
@@ -21,6 +24,20 @@ struct MachineClient {
   string right_ip;
   bool Generated_token;
 };
+
+string messageList(string AddMessage) { // Lista de mensagens
+  string messagereturn;
+  if (AddMessage.empty()) {
+    messagereturn = Messages.front();
+    Messages.pop();
+    return messagereturn;
+  } else if (Messages.size() <= 11) {
+    Messages.push(AddMessage);
+    return "Mensagem Adicionada";
+  } else {
+    return "Fila Cheia";
+  }
+}
 
 MachineClient machine_creation() { // Mudar depois caso necessario
   MachineClient Machine;
@@ -120,9 +137,22 @@ void server(MachineClient My_machine) {
   n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL,
                (struct sockaddr *)&cliaddr, &len);
   buffer[n] = '\0';
+
+  
+  string aviso, retorno;
+  aviso = messageList("Ola estou na lista");
   // Verifica se a maquina recebeu o token
   int tokenValue = stoi(buffer);
   if (tokenValue == 1000) {
+    if (Messages.size() != 0) {
+      retorno = messageList("");
+    }
+    sleep(My_machine.token_count);
+    printf("Client : %s\n", buffer);
+    sendto(sockfd, (const char *)retorno.c_str(), strlen(retorno.c_str()),
+           MSG_CONFIRM, (const struct sockaddr *)&cliaddr,
+           len); // Retorna valor
+    std::cout << "Hello message sent." << std::endl;
     // Checa se existe mensagem para enviar
   }
 
