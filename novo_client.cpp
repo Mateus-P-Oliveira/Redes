@@ -154,6 +154,16 @@ void client(MachineClient right_machine) {
 
   int n;
   socklen_t len;
+  //Teste se ela é maquina responsavel por emitir o token
+  if(right_machine.Generated_token == true){
+  const char *token = "1000";
+  sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
+         (const struct sockaddr *)&servaddr, sizeof(servaddr));
+  }
+  else{
+
+  }
+
 
   sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM,
          (const struct sockaddr *)&servaddr, sizeof(servaddr));
@@ -199,3 +209,4 @@ int main(void) {
 
   return 0;
 }
+
