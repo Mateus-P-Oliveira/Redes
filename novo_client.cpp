@@ -10,12 +10,13 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstring>
 
 #define MAXLINE 2048
 #define PORT 8080
 
 using namespace std;
-
+//<token>;<apelido de origem>:<apelido do destino>:<controle de erro>:<CRC>:<mensagem>
 queue<string> Messages; // Cria Lista de mensagens
 
 struct MachineClient {
@@ -120,7 +121,7 @@ void server(MachineClient My_machine) {
   servaddr.sin_family = AF_INET; // IPv4
   servaddr.sin_addr.s_addr = inet_addr(
       "127.0.0.2"); // Defino na mão o address que qeuro o servidor //INADDR_ANY
-                    // --Caso queira me ligar a todas entradas
+                    // --Caso<apelido de origem>:<apelido do destino>:<controle de erro>:<CRC>:<mensagem> queira me ligar a todas entradas
   servaddr.sin_port = htons(PORT);
 
   // Bind the socket with the server address
@@ -138,30 +139,36 @@ void server(MachineClient My_machine) {
                (struct sockaddr *)&cliaddr, &len);
   buffer[n] = '\0';
 
-
   string aviso, retorno;
   aviso = messageList("Ola estou na lista");
 
   // Verifica se a maquina recebeu o token
+  string mensagemCompleta = buffer;
+  string token_received;
+  //Split String Value
+  token_received = strtok(mensagemCompleta,';')
   int tokenValue = stoi(buffer);
-  if (tokenValue == 1000) { //Mudar para 2000
+  
+  if (tokenValue == 1000) { // Mudar para 2000
     // Checa se existe mensagem para enviar
     if (Messages.size() != 0) {
       retorno = messageList("");
-          sleep(My_machine.token_count);
-    printf("Client : %s\n", buffer);
-    sendto(sockfd, (const char *)retorno.c_str(), strlen(retorno.c_str()),
-           MSG_CONFIRM, (const struct sockaddr *)&cliaddr,
-           len); // Retorna valor
-    std::cout << "Hello message sent." << std::endl;
-    }
-    else{ //Manda token para proxima maquina
-      sendto(sockfd, (const char *)buffer, strlen(buffer),
-           MSG_CONFIRM, (const struct sockaddr *)&cliaddr,
-           len); // Retorna valor
+      sleep(My_machine.token_count);
+      printf("Client : %s\n", buffer);
+      sendto(sockfd, (const char *)retorno.c_str(), strlen(retorno.c_str()),
+             MSG_CONFIRM, (const struct sockaddr *)&cliaddr,
+             len); // Retorna valor
+      std::cout << "Hello message sent." << std::endl;
+    } else { // Manda token para proxima maquina
+      sendto(sockfd, (const char *)buffer, strlen(buffer), MSG_CONFIRM,
+             (const struct sockaddr *)&cliaddr,
+             len); // Retorna valor
     }
 
-    
+  
+  }
+  else if (tokenValue == 2000){
+  
   }
 
   sleep(My_machine.token_count);
