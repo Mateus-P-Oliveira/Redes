@@ -138,22 +138,30 @@ void server(MachineClient My_machine) {
                (struct sockaddr *)&cliaddr, &len);
   buffer[n] = '\0';
 
-  
+
   string aviso, retorno;
   aviso = messageList("Ola estou na lista");
+
   // Verifica se a maquina recebeu o token
   int tokenValue = stoi(buffer);
-  if (tokenValue == 1000) {
+  if (tokenValue == 1000) { //Mudar para 2000
+    // Checa se existe mensagem para enviar
     if (Messages.size() != 0) {
       retorno = messageList("");
-    }
-    sleep(My_machine.token_count);
+          sleep(My_machine.token_count);
     printf("Client : %s\n", buffer);
     sendto(sockfd, (const char *)retorno.c_str(), strlen(retorno.c_str()),
            MSG_CONFIRM, (const struct sockaddr *)&cliaddr,
            len); // Retorna valor
     std::cout << "Hello message sent." << std::endl;
-    // Checa se existe mensagem para enviar
+    }
+    else{ //Manda token para proxima maquina
+      sendto(sockfd, (const char *)buffer, strlen(buffer),
+           MSG_CONFIRM, (const struct sockaddr *)&cliaddr,
+           len); // Retorna valor
+    }
+
+    
   }
 
   sleep(My_machine.token_count);
@@ -194,7 +202,6 @@ void client(MachineClient right_machine) {
     const char *token = "1000";
     sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
            (const struct sockaddr *)&servaddr, sizeof(servaddr));
-  } else {
   }
 
   sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM,
