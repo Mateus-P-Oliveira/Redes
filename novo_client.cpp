@@ -158,23 +158,45 @@ void client(MachineClient right_machine) {
   close(sockfd);
 }
 
+
+int menu(MachineClient my_pc){
+  int escolha;
+  cout << "1-Server \n2-Client" << endl;
+  cin >> escolha;
+  if(escolha == 1){
+    cout << "Server" << endl;
+    server(my_pc);
+  }
+  else if (escolha == 2) {
+    cout << "Client" << endl;
+  client(my_pc);
+  }
+  else{
+    return 1;
+  }
+    return 0;
+}
+
 int main(void) {
+  int loopControl=0;
   MachineClient my_pc;
   my_pc = machine_creation();
-  cout << my_pc.right_ip << endl;
-  cout << my_pc.name << endl;
-  cout << my_pc.token_count << endl;
-  cout << my_pc.Generated_token << endl;
+  cout << "Configuração" << endl;
+  cout << my_pc.right_ip << " | " << my_pc.name << " | " << my_pc.token_count << " | " << my_pc.Generated_token << endl;
+  
    while(1){
-     client(my_pc); // Envio dados para a maquina vizinha
-    //---------------------------------
+    loopControl = menu(my_pc);
+    if(loopControl == 1) break;
+
+   }
         
   //-----------------------------------Servidor
-    server(my_pc); // Espero a entradade dados
+      //server(my_pc); // Espero a entradade dados
     //----------------------------------- Cliente
     
+    // client(my_pc); // Envio dados para a maquina vizinha
    
-   }
+    //---------------------------------
    
    
  
