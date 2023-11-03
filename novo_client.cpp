@@ -90,12 +90,10 @@ void server(MachineClient My_machine) {
     exit(EXIT_FAILURE);
   }
 
-//Força a reusar o mesmo socket 
-const int enable = 1;
-if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+  // Força a reusar o mesmo socket
+  const int enable = 1;
+  if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
     perror("setsockopt(SO_REUSEADDR) failed");
-
-
 
   struct sockaddr_in servaddr, cliaddr;
   memset(&servaddr, 0, sizeof(servaddr));
@@ -122,6 +120,12 @@ if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
   n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL,
                (struct sockaddr *)&cliaddr, &len);
   buffer[n] = '\0';
+  // Verifica se a maquina recebeu o token
+  int tokenValue = stoi(buffer);
+  if (tokenValue == 1000) {
+    // Checa se existe mensagem para enviar
+  }
+
   sleep(My_machine.token_count);
   printf("Client : %s\n", buffer);
   sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM,
@@ -154,16 +158,14 @@ void client(MachineClient right_machine) {
 
   int n;
   socklen_t len;
-  //Teste se ela é maquina responsavel por emitir o token
-  if(right_machine.Generated_token == true){
-  const char *token = "1000";
-  sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
-         (const struct sockaddr *)&servaddr, sizeof(servaddr));
-  }
-  else{
 
+  // Teste se ela é maquina responsavel por emitir o token
+  if (right_machine.Generated_token == true) {
+    const char *token = "1000";
+    sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
+           (const struct sockaddr *)&servaddr, sizeof(servaddr));
+  } else {
   }
-
 
   sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM,
          (const struct sockaddr *)&servaddr, sizeof(servaddr));
@@ -209,4 +211,3 @@ int main(void) {
 
   return 0;
 }
-
