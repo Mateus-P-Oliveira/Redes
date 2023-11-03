@@ -90,13 +90,22 @@ void server(MachineClient My_machine) {
     exit(EXIT_FAILURE);
   }
 
+//Força a reusar o mesmo socket 
+const int enable = 1;
+if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    perror("setsockopt(SO_REUSEADDR) failed");
+
+
+
   struct sockaddr_in servaddr, cliaddr;
   memset(&servaddr, 0, sizeof(servaddr));
   memset(&cliaddr, 0, sizeof(cliaddr));
 
   // Filling server information
   servaddr.sin_family = AF_INET; // IPv4
-  servaddr.sin_addr.s_addr = inet_addr("127.0.0.2"); //Defino na mão o address que qeuro o servidor //INADDR_ANY   --Caso queira me ligar a todas entradas
+  servaddr.sin_addr.s_addr = inet_addr(
+      "127.0.0.2"); // Defino na mão o address que qeuro o servidor //INADDR_ANY
+                    // --Caso queira me ligar a todas entradas
   servaddr.sin_port = htons(PORT);
 
   // Bind the socket with the server address
@@ -158,47 +167,35 @@ void client(MachineClient right_machine) {
   close(sockfd);
 }
 
-
-int menu(MachineClient my_pc){
+int menu(MachineClient my_pc) {
   int escolha;
   cout << "1-Server \n2-Client" << endl;
   cin >> escolha;
-  if(escolha == 1){
+  if (escolha == 1) {
     cout << "Server" << endl;
     server(my_pc);
-  }
-  else if (escolha == 2) {
+  } else if (escolha == 2) {
     cout << "Client" << endl;
-  client(my_pc);
-  }
-  else{
+    client(my_pc);
+  } else {
     return 1;
   }
-    return 0;
+  return 0;
 }
 
 int main(void) {
-  int loopControl=0;
+  int loopControl = 0;
   MachineClient my_pc;
   my_pc = machine_creation();
   cout << "Configuração" << endl;
-  cout << my_pc.right_ip << " | " << my_pc.name << " | " << my_pc.token_count << " | " << my_pc.Generated_token << endl;
-  
-   while(1){
-    loopControl = menu(my_pc);
-    if(loopControl == 1) break;
+  cout << my_pc.right_ip << " | " << my_pc.name << " | " << my_pc.token_count
+       << " | " << my_pc.Generated_token << endl;
 
-   }
-        
-  //-----------------------------------Servidor
-      //server(my_pc); // Espero a entradade dados
-    //----------------------------------- Cliente
-    
-    // client(my_pc); // Envio dados para a maquina vizinha
-   
-    //---------------------------------
-   
-   
- 
+  while (1) {
+    loopControl = menu(my_pc);
+    if (loopControl == 1)
+      break;
+  }
+
   return 0;
 }
