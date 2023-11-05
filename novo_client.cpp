@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <bits/stdc++.h>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <netinet/in.h>
@@ -10,13 +11,14 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <cstring>
+#include <vector>
 
 #define MAXLINE 2048
 #define PORT 8080
 
 using namespace std;
-//<token>;<apelido de origem>:<apelido do destino>:<controle de erro>:<CRC>:<mensagem>
+//<token>;<apelido de origem>:<apelido do destino>:<controle de
+// erro>:<CRC>:<mensagem>
 queue<string> Messages; // Cria Lista de mensagens
 
 struct MachineClient {
@@ -25,6 +27,23 @@ struct MachineClient {
   string right_ip;
   bool Generated_token;
 };
+
+// for string delimiter
+// https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
+std::vector<std::string> split(std::string s, std::string delimiter) {
+  size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+  std::string token;
+  std::vector<std::string> res;
+
+  while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+    token = s.substr(pos_start, pos_end - pos_start);
+    pos_start = pos_end + delim_len;
+    res.push_back(token);
+  }
+
+  res.push_back(s.substr(pos_start));
+  return res;
+}
 
 string messageList(string AddMessage) { // Lista de mensagens
   string messagereturn;
@@ -121,7 +140,9 @@ void server(MachineClient My_machine) {
   servaddr.sin_family = AF_INET; // IPv4
   servaddr.sin_addr.s_addr = inet_addr(
       "127.0.0.2"); // Defino na mão o address que qeuro o servidor //INADDR_ANY
-                    // --Caso<apelido de origem>:<apelido do destino>:<controle de erro>:<CRC>:<mensagem> queira me ligar a todas entradas
+                    // --Caso<apelido de origem>:<apelido do destino>:<controle
+                    // de erro>:<CRC>:<mensagem> queira me ligar a todas
+                    // entradas
   servaddr.sin_port = htons(PORT);
 
   // Bind the socket with the server address
@@ -145,11 +166,12 @@ void server(MachineClient My_machine) {
   // Verifica se a maquina recebeu o token
   string mensagemCompleta = buffer;
   string token_received;
-  //Split String Value
-  token_received = strtok(mensagemCompleta,';')
-  int tokenValue = stoi(buffer);
-  
-  if (tokenValue == 1000) { // Mudar para 2000
+  // Split String Value
+  string delimiter = ";";
+  string token = mensagemCompleta.substr(0, mensagemCompleta.find(delimiter));
+  int tokenValue = stoi(token);
+
+  if (tokenValue == 1000) { // Checa valor do token
     // Checa se existe mensagem para enviar
     if (Messages.size() != 0) {
       retorno = messageList("");
@@ -165,10 +187,52 @@ void server(MachineClient My_machine) {
              len); // Retorna valor
     }
 
-  
-  }
-  else if (tokenValue == 2000){
-  
+  } else if (tokenValue == 2000) { // Não é o token e é a mensagem
+    // Fazer o delimiter aqui
+    string remover = ";"; // Remove o 2000; da mensagem
+    vector<string> v = split(mensagemCompleta, delimiter);
+    string cuttedString;
+    for (auto i : v) {
+      cuttedString = i;
+    }
+
+    // Segmenta a mensagem
+    // cout << "|||||" << endl;
+    // Adicionar contador
+    string origem, destino, controleErro, crc, mensagemRecebida;
+
+    int contador = 0;
+    string delimiter = ":";
+    vector<string> splitted = split(cuttedString, delimiter);
+    for (auto i : splitted) {
+      switch (contador) {
+      case 1:
+        // Apelido Origem
+        origem = i;
+        break;
+      case 2:
+        // Apelido destino
+        destino = i;
+        break;
+      case 3:
+        // controle de erro
+        controleErro = i;
+        break;
+      case 4:
+        // crc
+        crc = i;
+        break;
+      case 5:
+        // mensagem
+        mensagemRecebida = i;
+        break;
+      default:
+
+        break;
+      }
+
+      contador++;
+    }
   }
 
   sleep(My_machine.token_count);
@@ -206,7 +270,7 @@ void client(MachineClient right_machine) {
 
   // Teste se ela é maquina responsavel por emitir o token
   if (right_machine.Generated_token == true) {
-    const char *token = "1000";
+    const char *token = "2000;Bob:Mary:maquinanaoexiste:19385749:Oi pessoal!";
     sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
            (const struct sockaddr *)&servaddr, sizeof(servaddr));
   }
