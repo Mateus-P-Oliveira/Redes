@@ -1,3 +1,4 @@
+#include "CRC.h"
 #include <arpa/inet.h>
 #include <bits/stdc++.h>
 #include <cstring>
@@ -12,7 +13,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
-#include "CRC.h"
 
 #define MAXLINE 2048
 #define PORT 8080
@@ -324,24 +324,32 @@ void server(MachineClient My_machine) {
       }
     }
 
-    if(notMachine == 0){
+    if (notMachine == 0) { // Se não for a maquina origem
       str1 = My_machine.name.compare(destino);
-      if(str1 == 0){ //Se for verdade
-          controleErro = "ACK";
-
+      if (str1 == 0) { // Se for verdade
+        string pacote;
+        controleErro =
+            "ACK"; //  uint32_t crc = CRC::Calculate(mensagemRecebida,
+                   //  sizeof(mensagemRecebida), CRC::CRC_32());
+        pacote = "2000;" + origem + ':' + destino + ':' + controleErro + ':' +
+                 crc + mensagemRecebida;
+        sendto(sockfd, (const char *)pacote.c_str(), strlen(pacote.c_str()),
+               MSG_CONFIRM, (const struct sockaddr *)&cliaddr, len);
+        cout << origem << endl;
+        cout << mensagemRecebida << endl;
       }
 
-
+    } else {
+      str2 = controleErro.compare("maquinanaoexiste");
+      str3 = controleErro.compare("ACK");
+      if (str2 != 0) {
+        if (str3 == 0) {
+          sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
+                 (const struct sockaddr *)&cliaddr, len);
+        }
+      }
     }
-
-
   }
-
-  // sleep(My_machine.token_count);
-  //  printf("Client : %s\n", buffer);
-  //  sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM,
-  //        (const struct sockaddr *)&cliaddr, len);
-  // std::cout << "Hello message sent." << std::endl;
 }
 
 // Client
@@ -372,9 +380,8 @@ void client(MachineClient right_machine) {
 
   // Teste se ela é maquina responsavel por emitir o token
   if (right_machine.Generated_token == true) { // Token é 1000;
-    const char *token =
-        "2000;Bob:Mary:maquinanaoexiste:19385749:Oi pessoal!"; //"2000;Bob:Mary:maquinanaoexiste:19385749:Oi
-                                                               // pessoal!";
+    const char *token = "1000;"; //"2000;Bob:Mary:maquinanaoexiste:19385749:Oi
+                                 // pessoal!";
     sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
            (const struct sockaddr *)&servaddr, sizeof(servaddr));
   }
@@ -398,13 +405,16 @@ int menu(MachineClient my_pc) {
   cin >> escolha;
   if (escolha == 1) {
     cout << "Server" << endl;
+
     server(my_pc);
+
   } else if (escolha == 2) {
     cout << "Client" << endl;
     client(my_pc);
   } else if (escolha == 3) {
     cout << "Crie Mensagem " << endl;
     std::getline(std::cin >> std::ws, mensagemCriada);
+
     // cin >> mensagemCriada;
     // cin.ignore();
     messageList(mensagemCriada);
