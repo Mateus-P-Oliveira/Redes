@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
+#include "CRC.h"
 
 #define MAXLINE 2048
 #define PORT 8080
@@ -305,7 +306,7 @@ void server(MachineClient My_machine) {
     }
 
     const char *token = "1000;";
-    int str1, str2, str3;
+    int str1, str2, str3, notMachine = 0;
     // Comparador para ver se a mensagem voltou
     // Comparo nome
     str1 = origem.compare(origemEnvio);
@@ -319,8 +320,21 @@ void server(MachineClient My_machine) {
         // cout << "Ola" << endl;
         sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
                (const struct sockaddr *)&cliaddr, len);
+        notMachine = 1;
       }
     }
+
+    if(notMachine == 0){
+      str1 = My_machine.name.compare(destino);
+      if(str1 == 0){ //Se for verdade
+          controleErro = "ACK";
+
+      }
+
+
+    }
+
+
   }
 
   // sleep(My_machine.token_count);
