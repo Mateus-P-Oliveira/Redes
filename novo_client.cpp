@@ -206,25 +206,30 @@ void server(MachineClient My_machine) {
     vector<string> splitted = split(cuttedString, delimiter);
     for (auto i : splitted) {
       switch (contador) {
-      case 1:
+      case 0:
         // Apelido Origem
         origem = i;
+        cout << origem << endl;
         break;
-      case 2:
+      case 1:
         // Apelido destino
         destino = i;
+        cout << destino << endl;
         break;
-      case 3:
+      case 2:
         // controle de erro
         controleErro = i;
+        cout << controleErro << endl;
         break;
-      case 4:
+      case 3:
         // crc
         crc = i;
+        cout << crc << endl;
         break;
-      case 5:
+      case 4:
         // mensagem
         mensagemRecebida = i;
+        cout << mensagemRecebida << endl;
         break;
       default:
 
