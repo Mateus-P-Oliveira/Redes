@@ -190,7 +190,7 @@ void server(MachineClient My_machine) {
              MSG_CONFIRM, (const struct sockaddr *)&cliaddr,
              len); // Retorna valor
 
-      std::cout << "Hello message sent." << std::endl;
+      cout << "Hello message sent." << endl;
     } else { // Manda token para proxima maquina
       sendto(sockfd, (const char *)buffer, strlen(buffer), MSG_CONFIRM,
              (const struct sockaddr *)&cliaddr,
@@ -200,8 +200,8 @@ void server(MachineClient My_machine) {
   } else if (tokenValue == 2000) { // Dados a serem enviados
     // Fazer o delimiter aqui
     //---------------------------------------------------------
-    // mensagemEnviada = messageList("");
-    // cout << mensagemEnviada << endl;
+    mensagemEnviada = messageList("");
+    cout << mensagemEnviada << endl;
     //---------------------------------------------------------
 
     cout << "Entrei nos 2000" << endl;
@@ -303,13 +303,31 @@ void server(MachineClient My_machine) {
 
       contador++;
     }
+
+    const char *token = "1000;";
+    int str1, str2, str3;
+    // Comparador para ver se a mensagem voltou
+    // Comparo nome
+    str1 = origem.compare(origemEnvio);
+    // Comparo origem
+    str2 = destino.compare(destinoEnvio);
+    // Comparo mensagem
+    str3 = mensagemRecebida.compare(mensagemRecebidaEnvio);
+
+    if (str1 == str2) {
+      if (str1 == str3) {
+        // cout << "Ola" << endl;
+        sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
+               (const struct sockaddr *)&cliaddr, len);
+      }
+    }
   }
 
-  sleep(My_machine.token_count);
-  printf("Client : %s\n", buffer);
-  sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM,
-         (const struct sockaddr *)&cliaddr, len);
-  std::cout << "Hello message sent." << std::endl;
+  // sleep(My_machine.token_count);
+  //  printf("Client : %s\n", buffer);
+  //  sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM,
+  //        (const struct sockaddr *)&cliaddr, len);
+  // std::cout << "Hello message sent." << std::endl;
 }
 
 // Client
@@ -342,7 +360,7 @@ void client(MachineClient right_machine) {
   if (right_machine.Generated_token == true) { // Token é 1000;
     const char *token =
         "2000;Bob:Mary:maquinanaoexiste:19385749:Oi pessoal!"; //"2000;Bob:Mary:maquinanaoexiste:19385749:Oi
-                                                               //pessoal!";
+                                                               // pessoal!";
     sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
            (const struct sockaddr *)&servaddr, sizeof(servaddr));
   }
@@ -372,7 +390,9 @@ int menu(MachineClient my_pc) {
     client(my_pc);
   } else if (escolha == 3) {
     cout << "Crie Mensagem " << endl;
-    cin >> mensagemCriada;
+    std::getline(std::cin >> std::ws, mensagemCriada);
+    // cin >> mensagemCriada;
+    // cin.ignore();
     messageList(mensagemCriada);
   } else {
     return 1;
