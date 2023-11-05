@@ -163,6 +163,13 @@ void server(MachineClient My_machine) {
   string aviso, retorno;
   aviso = messageList("Ola estou na lista");
 
+  if (My_machine.Generated_token == true) { // Token é 1000;
+    const char *token =
+        "1000;"; //"2000;Bob:Mary:maquinanaoexiste:19385749:Oi pessoal!";
+    sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
+           (const struct sockaddr *)&servaddr, sizeof(servaddr));
+  }
+
   // Verifica se a maquina recebeu o token
   string mensagemCompleta = buffer;
   string token_received;
@@ -170,16 +177,19 @@ void server(MachineClient My_machine) {
   string delimiter = ";";
   string token = mensagemCompleta.substr(0, mensagemCompleta.find(delimiter));
   int tokenValue = stoi(token);
-
+  string mensagemEnviada;
   if (tokenValue == 1000) { // Checa valor do token
     // Checa se existe mensagem para enviar
-    if (Messages.size() != 0) {
+
+    if (Messages.size() != 0) { // Envio os dados por aqui
       retorno = messageList("");
       sleep(My_machine.token_count);
       printf("Client : %s\n", buffer);
+      mensagemEnviada = retorno;
       sendto(sockfd, (const char *)retorno.c_str(), strlen(retorno.c_str()),
              MSG_CONFIRM, (const struct sockaddr *)&cliaddr,
              len); // Retorna valor
+
       std::cout << "Hello message sent." << std::endl;
     } else { // Manda token para proxima maquina
       sendto(sockfd, (const char *)buffer, strlen(buffer), MSG_CONFIRM,
@@ -187,22 +197,77 @@ void server(MachineClient My_machine) {
              len); // Retorna valor
     }
 
-  } else if (tokenValue == 2000) { // Não é o token e é a mensagem
+  } else if (tokenValue == 2000) { // Dados a serem enviados
     // Fazer o delimiter aqui
+    //---------------------------------------------------------
+    // mensagemEnviada = messageList("");
+    // cout << mensagemEnviada << endl;
+    //---------------------------------------------------------
+
+    cout << "Entrei nos 2000" << endl;
     string remover = ";"; // Remove o 2000; da mensagem
     vector<string> v = split(mensagemCompleta, delimiter);
     string cuttedString;
+
+    // Comrta a string original enviada para poder comparar com a string
+    // recebida
+    vector<string> k = split(mensagemEnviada, delimiter);
+    string cuttedStringOriginal;
+    for (auto j : k) {
+      cuttedStringOriginal = j;
+    }
+
+    // Se for igual recebe e pssa o token para a maquina seguinte
+    string delimiter = ":";
+    string origemEnvio, destinoEnvio, controleErroEnvio, crcEnvio,
+        mensagemRecebidaEnvio;
+    int contador2 = 0;
+    vector<string> splittedOriginal = split(cuttedStringOriginal, delimiter);
+    for (auto k : splittedOriginal) {
+      switch (contador2) {
+      case 0:
+        // Apelido Origem
+        origemEnvio = k;
+        cout << origemEnvio << endl;
+        break;
+      case 1:
+        // Apelido destino
+        destinoEnvio = k;
+        cout << destinoEnvio << endl;
+        break;
+      case 2:
+        // controle de erro
+        controleErroEnvio = k;
+        cout << controleErroEnvio << endl;
+        break;
+      case 3:
+        // crc
+        crcEnvio = k;
+        cout << crcEnvio << endl;
+        break;
+      case 4:
+        // mensagem
+        mensagemRecebidaEnvio = k;
+        cout << mensagemRecebidaEnvio << endl;
+        break;
+      default:
+
+        break;
+      }
+
+      contador2++;
+    }
+    // Segmenta a mensagem
+    cout << "|||||" << endl;
+    // Adicionar contador
     for (auto i : v) {
       cuttedString = i;
     }
 
-    // Segmenta a mensagem
-    // cout << "|||||" << endl;
-    // Adicionar contador
     string origem, destino, controleErro, crc, mensagemRecebida;
 
     int contador = 0;
-    string delimiter = ":";
+
     vector<string> splitted = split(cuttedString, delimiter);
     for (auto i : splitted) {
       switch (contador) {
@@ -274,8 +339,10 @@ void client(MachineClient right_machine) {
   socklen_t len;
 
   // Teste se ela é maquina responsavel por emitir o token
-  if (right_machine.Generated_token == true) {
-    const char *token = "2000;Bob:Mary:maquinanaoexiste:19385749:Oi pessoal!";
+  if (right_machine.Generated_token == true) { // Token é 1000;
+    const char *token =
+        "2000;Bob:Mary:maquinanaoexiste:19385749:Oi pessoal!"; //"2000;Bob:Mary:maquinanaoexiste:19385749:Oi
+                                                               //pessoal!";
     sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
            (const struct sockaddr *)&servaddr, sizeof(servaddr));
   }
@@ -294,7 +361,8 @@ void client(MachineClient right_machine) {
 
 int menu(MachineClient my_pc) {
   int escolha;
-  cout << "1-Server \n2-Client" << endl;
+  string mensagemCriada;
+  cout << "1-Server \n2-Client \n3-Criar e Adicionar Mensagem" << endl;
   cin >> escolha;
   if (escolha == 1) {
     cout << "Server" << endl;
@@ -302,6 +370,10 @@ int menu(MachineClient my_pc) {
   } else if (escolha == 2) {
     cout << "Client" << endl;
     client(my_pc);
+  } else if (escolha == 3) {
+    cout << "Crie Mensagem " << endl;
+    cin >> mensagemCriada;
+    messageList(mensagemCriada);
   } else {
     return 1;
   }
