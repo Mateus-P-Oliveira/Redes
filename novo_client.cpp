@@ -163,14 +163,15 @@ void server(MachineClient My_machine) {
 
   string aviso, retorno;
   aviso = messageList("Ola estou na lista");
-
+  //Verifico se a configuração dela é para enviar os tokens
   if (My_machine.Generated_token == true) { // Token é 1000;
+    cout << "Entrei na lista do Token " << endl;
     const char *token =
         "1000;"; //"2000;Bob:Mary:maquinanaoexiste:19385749:Oi pessoal!";
     sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
            (const struct sockaddr *)&servaddr, sizeof(servaddr));
   }
-
+  
   // Verifica se a maquina recebeu o token
   string mensagemCompleta = buffer;
   string token_received;
