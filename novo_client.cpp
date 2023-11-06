@@ -140,7 +140,7 @@ void server(MachineClient My_machine) {
   // Filling server information
   servaddr.sin_family = AF_INET; // IPv4
   servaddr.sin_addr.s_addr = inet_addr(
-      "127.0.0.2"); // Defino na mão o address que qeuro o servidor //INADDR_ANY
+      "127.0.0.2"); // Defino na mão o address que qeuro o servidor //INADDR_ANYgis
                     // --Caso<apelido de origem>:<apelido do destino>:<controle
                     // de erro>:<CRC>:<mensagem> queira me ligar a todas
                     // entradas
@@ -204,7 +204,7 @@ void server(MachineClient My_machine) {
     // Fazer o delimiter aqui
     //---------------------------------------------------------
     mensagemEnviada = messageList("");
-    cout << mensagemEnviada << endl;
+    //cout << mensagemEnviada << endl;
     //---------------------------------------------------------
 
     cout << "Entrei nos 2000" << endl;
@@ -319,7 +319,7 @@ void server(MachineClient My_machine) {
 
     if (str1 == str2) {
       if (str1 == str3) {
-        // cout << "Ola" << endl;
+        cout << "Ola" << endl;
         sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
                (const struct sockaddr *)&cliaddr, len);
         notMachine = 1;
@@ -382,7 +382,7 @@ void client(MachineClient right_machine) {
 
   // Teste se ela é maquina responsavel por emitir o token
   if (right_machine.Generated_token == true) { // Token é 1000;
-    const char *token = "1000;"; //"2000;Bob:Mary:maquinanaoexiste:19385749:Oi
+    const char *token = "1000;"; //"2000;Maquina1:Maquina2:maquinanaoexiste:19385749:Oi
                                  // pessoal!";
     sendto(sockfd, (const char *)token, strlen(token), MSG_CONFIRM,
            (const struct sockaddr *)&servaddr, sizeof(servaddr));
