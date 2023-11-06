@@ -185,6 +185,7 @@ void server(MachineClient My_machine) {
 
     if (Messages.size() != 0) { // Envio os dados por aqui
       retorno = messageList("");
+      cout << "Entrei na lista de Mensagens" << endl;
       sleep(My_machine.token_count);
       printf("Client : %s\n", buffer);
       mensagemEnviada = retorno;
