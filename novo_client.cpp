@@ -1,4 +1,3 @@
-#include "CRC.h"
 #include <arpa/inet.h>
 #include <bits/stdc++.h>
 #include <cstring>
@@ -337,6 +336,7 @@ void server(MachineClient My_machine) {
                  crc + mensagemRecebida;
         sendto(sockfd, (const char *)pacote.c_str(), strlen(pacote.c_str()),
                MSG_CONFIRM, (const struct sockaddr *)&cliaddr, len);
+        cout << "---------------------------" << endl;
         cout << origem << endl;
         cout << mensagemRecebida << endl;
       }
@@ -380,7 +380,7 @@ void client(MachineClient right_machine) {
   int n;
   socklen_t len;
 
-  // Teste se ela é maquina responsavel por emitir o token
+  // Teste se ela é maquina responsavel por emitir o token  //Para testar mensagens descomento embaixo
   if (right_machine.Generated_token == true) { // Token é 1000;
     const char *token = "1000;"; //"2000;Maquina1:Maquina2:maquinanaoexiste:19385749:Oi
                                  // pessoal!";
